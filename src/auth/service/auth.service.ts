@@ -29,11 +29,12 @@ export class AuthService {
     }
   }
 
-  async login(user: User) {
+  login(user: User) {
     try {
       const payload = { email: user.email, sub: user.id, role: user.role };
+      const token = this.jwtService.sign(payload);
       return {
-        access_token: await this.jwtService.sign(payload),
+        access_token: token,
         user: {
           id: user.id,
           fullName: user.name,
@@ -65,7 +66,7 @@ export class AuthService {
         role: userData.role ?? UserRole.CIUDADANO,
       });
 
-      return await this.login(user);
+      return this.login(user);
     } catch (error) {
       if (error instanceof UnauthorizedException) {
         throw error;
