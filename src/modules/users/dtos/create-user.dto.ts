@@ -1,6 +1,7 @@
 import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { PartialType } from '@nestjs/mapped-types';
+import { UserRole } from '../entities/user.enum';
 
 export class CreateUserDto {
   @ApiProperty({ example: 'juan@example.com' })
@@ -16,9 +17,12 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 
-  @ApiProperty({ enum: ['admin', 'asesor', 'ciudadano'], example: 'ciudadano' })
-  @IsEnum(['admin', 'asesor', 'ciudadano'])
-  role: 'admin' | 'asesor' | 'ciudadano';
+  @ApiProperty({
+    enum: [UserRole.ADMIN, UserRole.ASESOR, UserRole.CIUDADANO],
+    example: 'ciudadano',
+  })
+  @IsEnum([UserRole.ADMIN, UserRole.ASESOR, UserRole.CIUDADANO])
+  role: UserRole;
 }
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
