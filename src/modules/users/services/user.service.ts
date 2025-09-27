@@ -72,6 +72,21 @@ export class UsersService {
     }
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    try {
+      const user = await this.userRepo.findOne({
+        where: { email },
+        relations: ['tramites'],
+      });
+      return user || null;
+    } catch (error) {
+      console.error('Error en findByEmail():', error);
+      throw new InternalServerErrorException(
+        'Error al obtener el usuario por email',
+      );
+    }
+  }
+
   async update(id: number, dto: UpdateUserDto): Promise<User> {
     try {
       const user = await this.findOne(id);
