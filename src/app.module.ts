@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import dbConfig from './config/db.config';
+import { UsersModule } from './modules/users/user.module';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import dbConfig from './config/db.config';
       password: dbConfig().database.password,
       database: dbConfig().database.db,
       autoLoadEntities: true,
-      synchronize: false, //! ¡Importante!: Nunca sincronisar con bases de datos existentes en ambientes productivos
+      synchronize: false, //! Important: Never synchronise with existing databases in productive environments.
       logging: process.env.NODE_ENV !== 'production' ? true : ['error', 'warn'],
       extra: {
         ssl: {
@@ -38,6 +39,7 @@ import dbConfig from './config/db.config';
         },
       },
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
