@@ -7,6 +7,7 @@ import * as Joi from 'joi';
 import dbConfig from './config/db.config';
 import { UsersModule } from './modules/users/user.module';
 import { AuthModule } from './auth/auth.module';
+import { TramitesModule } from './modules/tramites/tramites.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { AuthModule } from './auth/auth.module';
     }),
     UsersModule,
     AuthModule,
+    TramitesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

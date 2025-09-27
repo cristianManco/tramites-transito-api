@@ -4,8 +4,11 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToOne,
   JoinColumn,
 } from 'typeorm';
+import { Tramite } from './tramites.entity';
+import { TurnoEstado } from './tramites.enum';
 
 @Entity('turnos')
 export class Turno {
@@ -31,8 +34,15 @@ export class Turno {
 
   @Column({
     type: 'enum',
-    enum: ['pendiente', 'atendido', 'cancelado'],
-    default: 'pendiente',
+    enum: TurnoEstado,
+    default: TurnoEstado.PENDIENTE,
   })
-  estado: 'pendiente' | 'atendido' | 'cancelado';
+  estado: TurnoEstado;
+
+  @OneToOne(() => Tramite, (tramite) => tramite.turno, { nullable: true })
+  @JoinColumn({ name: 'tramite_id' })
+  tramite?: Tramite;
+
+  @Column()
+  tramite_id: number;
 }
