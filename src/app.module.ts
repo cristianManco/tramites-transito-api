@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import * as Joi from 'joi';
 import dbConfig from './config/db.config';
+import { UsersModule } from './modules/users/user.module';
+import { AuthModule } from './auth/auth.module';
+import { TramitesModule } from './modules/tramites/tramites.module';
 
 @Module({
   imports: [
@@ -20,6 +21,8 @@ import dbConfig from './config/db.config';
         DATABASE_USERNAME: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
         DATABASE_DB: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
+        PORT: Joi.number().default(3002),
       }),
     }),
     TypeOrmModule.forRoot({
@@ -30,7 +33,7 @@ import dbConfig from './config/db.config';
       password: dbConfig().database.password,
       database: dbConfig().database.db,
       autoLoadEntities: true,
-      synchronize: false, //! ¡Importante!: Nunca sincronisar con bases de datos existentes en ambientes productivos
+      synchronize: false, //! Important: Never synchronise with existing databases in productive environments.
       logging: process.env.NODE_ENV !== 'production' ? true : ['error', 'warn'],
       extra: {
         ssl: {
@@ -38,8 +41,11 @@ import dbConfig from './config/db.config';
         },
       },
     }),
+    UsersModule,
+    AuthModule,
+    TramitesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
