@@ -21,17 +21,12 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User | null> {
     try {
       const user = await this.usersService.findByEmail(email);
-      console.warn('Usuario encontrado en validateUser:', user);
-      console.warn('Usuario encontrado:', user?.email);
-      console.warn('Password recibido en login:', password);
-      console.warn('Password hash guardado:', user?.password);
 
       if (!user || !user.password) {
         return null;
       }
 
       const isMatch = await bcrypt.compare(password, user.password);
-      console.warn('Resultado bcrypt.compare:', isMatch);
 
       if (!isMatch) return null;
 
@@ -76,7 +71,6 @@ export class AuthService {
       if (userExists) {
         throw new UnauthorizedException('El correo ya está en uso');
       }
-      console.warn('Datos recibidos en register:', userData);
 
       const user = await this.usersService.create({
         ...userData,
