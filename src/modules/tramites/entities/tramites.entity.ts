@@ -4,11 +4,14 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  OneToOne,
   JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { TipoTramite } from './tipoTramite.entity';
+import { TramiteEstado } from './tramites.enum';
+import { Turno } from './turnos.entity';
 
 @Entity('tramites')
 export class Tramite {
@@ -31,10 +34,10 @@ export class Tramite {
 
   @Column({
     type: 'enum',
-    enum: ['pendiente', 'en_proceso', 'aprobado', 'rechazado'],
-    default: 'pendiente',
+    enum: TramiteEstado,
+    default: TramiteEstado.PENDIENTE,
   })
-  estado: 'pendiente' | 'en_proceso' | 'aprobado' | 'rechazado';
+  estado: TramiteEstado;
 
   @Column({ type: 'timestamp with time zone' })
   fecha_inicio: Date;
@@ -44,6 +47,12 @@ export class Tramite {
 
   @Column({ type: 'jsonb', nullable: true })
   datos_extra?: Record<string, any>;
+
+  @Column({ nullable: true })
+  turno_id?: number;
+
+  @OneToOne(() => Turno, (turno) => turno.tramite, { nullable: true })
+  turno?: Turno;
 
   @CreateDateColumn()
   createdAt: Date;
