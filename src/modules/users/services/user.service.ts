@@ -75,7 +75,7 @@ export class UsersService {
   async findByEmail(email: string): Promise<User | null> {
     try {
       const user = await this.userRepo.findOne({
-        where: { email },
+        where: { email: email },
         relations: ['tramites'],
       });
       return user || null;

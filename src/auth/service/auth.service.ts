@@ -2,6 +2,8 @@ import {
   Injectable,
   UnauthorizedException,
   InternalServerErrorException,
+  BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -19,10 +21,21 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<User | null> {
     try {
       const user = await this.usersService.findByEmail(email);
-      if (user && (await bcrypt.compare(password, user.password))) {
-        return user;
+      console.warn('Usuario encontrado en validateUser:', user);
+      console.warn('Usuario encontrado:', user?.email);
+      console.warn('Password recibido en login:', password);
+      console.warn('Password hash guardado:', user?.password);
+
+      if (!user || !user.password) {
+        return null;
       }
-      return null;
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      console.warn('Resultado bcrypt.compare:', isMatch);
+
+      if (!isMatch) return null;
+
+      return user;
     } catch (error) {
       console.error('Error en validateUser():', error);
       throw new InternalServerErrorException('Error al validar el usuario');
@@ -37,14 +50,21 @@ export class AuthService {
         access_token: token,
         user: {
           id: user.id,
-          fullName: user.name,
+          name: user.name,
           email: user.email,
           role: user.role,
         },
       };
     } catch (error) {
       console.error('Error en login():', error);
-      throw new InternalServerErrorException('Error al iniciar sesión');
+      if (
+        error instanceof UnauthorizedException ||
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
+        throw error;
+      }
+      throw new InternalServerErrorException('Error al iniciar sesión', error);
     }
   }
 
@@ -56,13 +76,13 @@ export class AuthService {
       if (userExists) {
         throw new UnauthorizedException('El correo ya está en uso');
       }
+      console.warn('Datos recibidos en register:', userData);
 
-      const hashedPassword = await bcrypt.hash(String(userData.password), 10);
       const user = await this.usersService.create({
         ...userData,
         email: String(userData.email),
         name: String(userData.name),
-        password: String(hashedPassword),
+        password: String(userData.password),
         role: userData.role ?? UserRole.CIUDADANO,
       });
 
